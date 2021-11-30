@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class DscatalogApplicationTests {
+public class DscatalogApplicationTests {
 
 	@Test
 	void contextLoads() {
+		
 	}
-
 }
