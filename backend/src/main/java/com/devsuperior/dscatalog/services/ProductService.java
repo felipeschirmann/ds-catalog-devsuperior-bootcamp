@@ -29,8 +29,8 @@ public class ProductService {
 
 	@Autowired
 	private CategoryRepository categoryRepository;
+	
 	@Transactional(readOnly = true)
-
 	public Page<ProductDTO> findAllPaged(Pageable pageable) {
 		// TODO Auto-generated method stub
 
