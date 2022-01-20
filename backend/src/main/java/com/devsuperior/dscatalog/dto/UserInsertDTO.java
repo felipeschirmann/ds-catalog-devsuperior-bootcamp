@@ -10,7 +10,7 @@ public class UserInsertDTO extends UserDTO {
 	private String password;
 
 	UserInsertDTO(){
-		
+		super();
 	}
 	
 	public String getPassword() {
