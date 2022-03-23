@@ -32,7 +32,7 @@ import com.devsuperior.dscatalog.services.exceptions.ResourceNotFoundException;
 @Service
 public class UserService implements UserDetailsService {
 	private static Logger logger = LoggerFactory.getLogger(UserService.class);
-	
+
 	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
 
@@ -51,9 +51,13 @@ public class UserService implements UserDetailsService {
 
 	@Transactional(readOnly = true)
 	public UserDTO findById(Long id) {
-		Optional<User> obj = repository.findById(id);
-		User entity = obj.orElseThrow(() -> new ResourceNotFoundException("Entity not Found"));
-		return new UserDTO(entity);
+		try {
+			Optional<User> obj = repository.findById(id);
+			User entity = obj.get();
+			return new UserDTO(entity);
+		} catch (EntityNotFoundException e) {
+			throw new ResourceNotFoundException("Id not found" + id);
+		}
 	}
 
 	@Transactional
@@ -68,7 +72,8 @@ public class UserService implements UserDetailsService {
 	@Transactional
 	public UserDTO update(Long id, UserUpdateDTO dto) {
 		try {
-			User entity = repository.getOne(id);
+			Optional<User> obj = repository.findById(id);
+			User entity = obj.get();
 			copyDtoToEntity(dto, entity);
 			entity = repository.save(entity);
 			return new UserDTO(entity);
@@ -93,10 +98,11 @@ public class UserService implements UserDetailsService {
 		entity.setFirstName(dto.getFirstName());
 		entity.setLastName(dto.getLastName());
 		entity.setEmail(dto.getEmail());
-
 		entity.getRoles().clear();
 		for (RoleDTO roleDTO : dto.getRoles()) {
-			Role role = roleRepository.getOne(roleDTO.getId());
+			Optional<Role> obj = roleRepository.findById(roleDTO.getId());
+			Role role = obj.orElseThrow(() -> new ResourceNotFoundException("Entity not Found"));
+
 			entity.getRoles().add(role);
 		}
 	}
@@ -104,13 +110,13 @@ public class UserService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		User user = repository.findByEmail(username);
-		
+
 		if (user == null) {
 			logger.error("User not Found: " + username);
 			throw new UsernameNotFoundException("Email not Found");
 		}
 		logger.info("User  Found: " + username);
-		
+
 		return user;
 	}
 

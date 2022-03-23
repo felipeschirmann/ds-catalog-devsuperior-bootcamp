@@ -32,10 +32,7 @@ public class ProductService {
 	
 	@Transactional(readOnly = true)
 	public Page<ProductDTO> findAllPaged(Pageable pageable) {
-		// TODO Auto-generated method stub
-
 		Page<Product> list = repository.findAll(pageable);
-
 		return list.map(x -> new ProductDTO(x));
 	}
 
@@ -57,7 +54,8 @@ public class ProductService {
 	@Transactional
 	public ProductDTO update(Long id, ProductDTO dto) {
 		try {
-			Product entity = repository.getOne(id);
+			Optional<Product> obj = repository.findById(id);
+			Product entity = obj.orElseThrow(() -> new ResourceNotFoundException("Entity not Found"));
 			copyDtoToEntity(dto, entity);
 			entity = repository.save(entity);
 			return new ProductDTO(entity);
@@ -87,7 +85,8 @@ public class ProductService {
 		
 		entity.getCategories().clear();
 		for (CategoryDTO catDTO : dto.getCategories()) {
-			Category category = categoryRepository.getOne(catDTO.getId());
+			Optional<Category> obj = categoryRepository.findById(catDTO.getId());
+			Category category = obj.orElseThrow(() -> new ResourceNotFoundException("Entity not Found"));
 			entity.getCategories().add(category);
 		}
 	}

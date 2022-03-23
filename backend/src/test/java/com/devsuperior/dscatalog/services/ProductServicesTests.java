@@ -68,11 +68,11 @@ public class ProductServicesTests {
 		Mockito.when(repository.findById(existingId)).thenReturn(Optional.of(product));
 		Mockito.when(repository.findById(nonExistingId)).thenReturn(Optional.empty());
 
-		Mockito.when(repository.getOne(existingId)).thenReturn(product);
-		Mockito.when(repository.getOne(nonExistingId)).thenThrow(EntityNotFoundException.class);
+		Mockito.when(repository.findById(existingId)).thenReturn(Optional.of(product));
+		Mockito.when(repository.findById(nonExistingId)).thenThrow(EntityNotFoundException.class);
 		
-		Mockito.when(categoryRepository.getOne(existingId)).thenReturn(category);
-		Mockito.when(categoryRepository.getOne(nonExistingId)).thenThrow(EntityNotFoundException.class);
+		Mockito.when(categoryRepository.findById(existingId)).thenReturn(Optional.of(category));
+		Mockito.when(categoryRepository.findById(nonExistingId)).thenThrow(EntityNotFoundException.class);
 		
 		Mockito.doNothing().when(repository).deleteById(existingId);
 		Mockito.doThrow(EmptyResultDataAccessException.class).when(repository).deleteById(nonExistingId);
@@ -121,7 +121,7 @@ public class ProductServicesTests {
 	
 	@Test
 	public void findByIdShouldThrowResourceNotFoundExceptionWhenDoesNotIdExists() {
-		Assertions.assertThrows(ResourceNotFoundException.class, ()-> {
+		Assertions.assertThrows(EntityNotFoundException.class, ()-> {
 			service.findById(nonExistingId);
 		});
 		Mockito.verify(repository, Mockito.times(1)).findById(nonExistingId);

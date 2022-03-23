@@ -14,18 +14,18 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
 @Configuration
 @EnableResourceServer
-public class ResouceServerConfig extends ResourceServerConfigurerAdapter{
+public class ResouceServerConfig extends ResourceServerConfigurerAdapter {
 
 	@Autowired
 	private Environment env;
-	
+
 	@Autowired
 	private JwtTokenStore tokenStore;
 
-	private static final String[] PUBLIC = {"/oauth/token", "/h2-console/**"};
-	private static final String[] OPERATOR_OR_ADMIN = {"/products/**", "/categories/**"};
-	private static final String[] ADMIN = {"/users/**"};
-	
+	private static final String[] PUBLIC = { "/oauth/token", "/h2-console/**" };
+	private static final String[] OPERATOR_OR_ADMIN = { "/products/**", "/categories/**" };
+	private static final String[] ADMIN = { "/users/**" };
+
 	@Override
 	public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
 		resources.tokenStore(tokenStore);
@@ -33,16 +33,14 @@ public class ResouceServerConfig extends ResourceServerConfigurerAdapter{
 
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
-		if (Arrays.asList(env.getActiveProfiles()).contains("test")){
+		if (Arrays.asList(env.getActiveProfiles()).contains("test")) {
 			http.headers().frameOptions().disable();
 		}
-		
-		http.authorizeRequests()
-			.antMatchers(PUBLIC).permitAll()
-			.antMatchers(HttpMethod.GET, OPERATOR_OR_ADMIN).permitAll()
-			.antMatchers(OPERATOR_OR_ADMIN).hasAnyRole("OPERATOR", "ADMIN")
-			.antMatchers(ADMIN).hasAnyRole(ADMIN)
-			.anyRequest().authenticated();
+		http.authorizeRequests().antMatchers(PUBLIC).permitAll();
+		http.authorizeRequests().antMatchers(HttpMethod.GET, OPERATOR_OR_ADMIN).permitAll();
+		http.authorizeRequests().antMatchers(OPERATOR_OR_ADMIN).hasAnyRole("OPERATOR", "ADMIN");
+		http.authorizeRequests().antMatchers(ADMIN).hasRole("ADMIN");
+		http.authorizeRequests().anyRequest().authenticated();
 	}
 
 }
